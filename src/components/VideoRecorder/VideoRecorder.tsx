@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { createDownloadButton, onStop, record, stopRecording } from "../utils/recorder";
+import { Button } from "../../@shadcn/components/ui/button";
 
 const VideoRecorder = () => {
   const [recorded, setRecorded] = useState(false);
   const [recording, setRecording] = useState(false);
   const startRecording = async () => {
-    setRecording(true);
     setRecorded(false);
+    setRecording(true);
     const preview = document.getElementById("preview") as HTMLVideoElement;
     await record(preview, (chunks) => {
       const recordingElement = document.getElementById("recording") as HTMLVideoElement;
@@ -14,6 +15,8 @@ const VideoRecorder = () => {
       const downloadButton = document.getElementById("downloadButton") as HTMLAnchorElement;
       createDownloadButton(downloadButton, recordingUrl, "recording");
       setRecording(false);
+      const recording = document.getElementById("recording") as HTMLVideoElement;
+      recording.play();
     });
   };
 
@@ -25,28 +28,44 @@ const VideoRecorder = () => {
 
   return (
     <div>
-      <div className="preview">
-        <h2>Preview</h2>
+      <div className="my-4">
         {recording ? (
-          <button id="stopButton" className="button" onClick={handleStop}>
-            Stop
-          </button>
+          <Button id="stopButton" onClick={handleStop}>
+            Parar grabación
+          </Button>
         ) : (
-          <button id="startButton" className="button" onClick={startRecording}>
-            New clip
-          </button>
+          <Button id="startButton" onClick={startRecording}>
+            Grabar un nuevo tiro
+          </Button>
         )}
       </div>
-      {recorded ? (
-        <div className="recording">
-          <video id="recording" width="160" height="120" controls></video>
-          <a id="downloadButton" className="button">
-            Download
-          </a>
-        </div>
-      ) : (
-        <video id="preview" width="160" height="120" autoPlay muted></video>
-      )}
+      
+      <div className="mb-4">
+        {recorded ? (
+          <>
+            <video
+              id="recording"
+              controls
+              muted
+              className="w-full h-full object-cover rounded-md mb-4"
+            />
+            <div className="mb-4">
+              <Button asChild>
+                <a id="downloadButton">
+                  Descargar grabación del tiro
+                </a>
+              </Button>
+            </div>
+          </>
+        ) : (
+          <video
+            id="preview"
+            autoPlay
+            muted
+            className="w-full h-full object-cover rounded-md mb-4"
+          />
+        )}
+      </div>
     </div>
   );
 };
